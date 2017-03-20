@@ -19,6 +19,16 @@ namespace ImageSharp
         where TColor : struct, IPixel<TColor>
     {
         /// <summary>
+        /// Gets or sets the maximum allowable width in pixels.
+        /// </summary>
+        public const int MaxWidth = int.MaxValue;
+
+        /// <summary>
+        /// Gets or sets the maximum allowable height in pixels.
+        /// </summary>
+        public const int MaxHeight = int.MaxValue;
+
+        /// <summary>
         /// The image pixels
         /// </summary>
         private TColor[] pixelBuffer;
@@ -59,7 +69,12 @@ namespace ImageSharp
         protected ImageBase(int width, int height, Configuration configuration = null)
         {
             this.Configuration = configuration ?? Configuration.Default;
-            this.InitPixels(width, height);
+            Guard.MustBeGreaterThan(width, 0, nameof(width));
+            Guard.MustBeGreaterThan(height, 0, nameof(height));
+
+            this.Width = width;
+            this.Height = height;
+            this.RentPixels();
             this.ClearPixels();
         }
 
@@ -89,12 +104,6 @@ namespace ImageSharp
                 sourcePixels.CopyTo(target);
             }
         }
-
-        /// <inheritdoc/>
-        public const int MaxWidth = int.MaxValue;
-
-        /// <inheritdoc/>
-        public const int MaxHeight = int.MaxValue;
 
         /// <inheritdoc/>
         public TColor[] Pixels => this.pixelBuffer;

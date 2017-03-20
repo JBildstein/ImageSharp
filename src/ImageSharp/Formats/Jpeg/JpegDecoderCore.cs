@@ -180,8 +180,8 @@ namespace ImageSharp.Formats
         /// the data to image.
         /// </summary>
         /// <typeparam name="TColor">The pixel format.</typeparam>
-        /// <param name="image">The image, where the data should be set to.</param>
         /// <param name="stream">The stream, where the image should be.</param>
+        /// <returns>The decoded image.</returns>
         public Image<TColor> Decode<TColor>(Stream stream)
             where TColor : struct, IPixel<TColor>
         {
@@ -196,9 +196,8 @@ namespace ImageSharp.Formats
         /// Decodes the image from the specified <see cref="Stream"/>  and sets
         /// the data to image.
         /// </summary>
-        /// <typeparam name="TColor">The pixel format.</typeparam>
-        /// <param name="image">The image, where the data should be set to.</param>
         /// <param name="stream">The stream, where the image should be.</param>
+        /// <returns>The image metadata.</returns>
         public ImageMetaData DecodeMetaData(Stream stream)
         {
             ImageMetaData metadata = new ImageMetaData();
@@ -288,7 +287,6 @@ namespace ImageSharp.Formats
         /// <summary>
         /// Read metadata from stream and read the blocks in the scans into <see cref="DecodedBlocks"/>.
         /// </summary>
-        /// <typeparam name="TColor">The pixel type</typeparam>
         /// <param name="metadata">The metadata</param>
         /// <param name="stream">The stream</param>
         /// <param name="metadataOnly">Whether to decode metadata only.</param>
@@ -507,7 +505,8 @@ namespace ImageSharp.Formats
         /// Convert the pixel data in <see cref="YCbCrImage"/> and/or <see cref="JpegPixelArea"/> into pixels of <see cref="Image{TColor}"/>
         /// </summary>
         /// <typeparam name="TColor">The pixel type</typeparam>
-        /// <param name="image">The destination image</param>
+        /// <param name="metadata">The loaded metadata</param>
+        /// <returns>The decoded image.</returns>
         private Image<TColor> ConvertJpegPixelsToImagePixels<TColor>(ImageMetaData metadata)
             where TColor : struct, IPixel<TColor>
         {

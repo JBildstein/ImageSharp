@@ -65,12 +65,12 @@ namespace ImageSharp.Formats
         /// <summary>
         /// The metadata
         /// </summary>
-        private ImageMetaData MetaData;
+        private ImageMetaData metaData;
 
         /// <summary>
         /// The image to decode the information to.
         /// </summary>
-        private Image<TColor> Image;
+        private Image<TColor> image;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GifDecoderCore{TColor}"/> class.
@@ -85,11 +85,12 @@ namespace ImageSharp.Formats
         /// Decodes the stream to the image.
         /// </summary>
         /// <param name="stream">The stream containing image data. </param>
+        /// <returns>The decoded image</returns>
         public Image<TColor> Decode(Stream stream)
         {
             try
             {
-                this.MetaData = new ImageMetaData();
+                this.metaData = new ImageMetaData();
 
                 this.currentStream = stream;
 
@@ -149,7 +150,7 @@ namespace ImageSharp.Formats
                 }
             }
 
-            return this.Image;
+            return this.image;
         }
 
         /// <summary>
@@ -218,11 +219,13 @@ namespace ImageSharp.Formats
                 throw new ImageFormatException($"Invalid gif colormap size '{this.logicalScreenDescriptor.GlobalColorTableSize}'");
             }
 
+            /* // No point doing this as the max width/height is always int.Max and that always bigger than the max size of a gif which is stored in a short.
             if (this.logicalScreenDescriptor.Width > Image<TColor>.MaxWidth || this.logicalScreenDescriptor.Height > Image<TColor>.MaxHeight)
             {
                 throw new ArgumentOutOfRangeException(
                     $"The input gif '{this.logicalScreenDescriptor.Width}x{this.logicalScreenDescriptor.Height}' is bigger then the max allowed size '{Image<TColor>.MaxWidth}x{Image<TColor>.MaxHeight}'");
             }
+            */
         }
 
         /// <summary>
@@ -267,7 +270,7 @@ namespace ImageSharp.Formats
                 {
                     this.currentStream.Read(commentsBuffer, 0, length);
                     string comments = this.options.TextEncoding.GetString(commentsBuffer, 0, length);
-                    this.MetaData.Properties.Add(new ImageProperty(GifConstants.Comments, comments));
+                    this.metaData.Properties.Add(new ImageProperty(GifConstants.Comments, comments));
                 }
                 finally
                 {
@@ -349,14 +352,14 @@ namespace ImageSharp.Formats
 
             if (this.previousFrame == null)
             {
-                this.MetaData.Quality = colorTableLength / 3;
+                this.metaData.Quality = colorTableLength / 3;
 
                 // This initializes the image to become fully transparent because the alpha channel is zero.
-                this.Image = new Image<TColor>(imageWidth, imageHeight, this.MetaData);
+                this.image = new Image<TColor>(imageWidth, imageHeight, this.metaData);
 
-                this.SetFrameDelay(this.MetaData);
+                this.SetFrameDelay(this.metaData);
 
-                image = this.Image;
+                image = this.image;
             }
             else
             {
@@ -374,7 +377,7 @@ namespace ImageSharp.Formats
 
                 this.RestoreToBackground(image);
 
-                this.Image.Frames.Add(currentFrame);
+                this.image.Frames.Add(currentFrame);
             }
 
             int i = 0;
@@ -447,7 +450,7 @@ namespace ImageSharp.Formats
                 return;
             }
 
-            this.previousFrame = currentFrame == null ? this.Image.ToFrame() : currentFrame;
+            this.previousFrame = currentFrame == null ? this.image.ToFrame() : currentFrame;
 
             if (this.graphicsControlExtension != null &&
                 this.graphicsControlExtension.DisposalMethod == DisposalMethod.RestoreToBackground)
@@ -468,8 +471,8 @@ namespace ImageSharp.Formats
             }
 
             // Optimization for when the size of the frame is the same as the image size.
-            if (this.restoreArea.Value.Width == this.Image.Width &&
-                this.restoreArea.Value.Height == this.Image.Height)
+            if (this.restoreArea.Value.Width == this.image.Width &&
+                this.restoreArea.Value.Height == this.image.Height)
             {
                 using (PixelAccessor<TColor> pixelAccessor = frame.Lock())
                 {

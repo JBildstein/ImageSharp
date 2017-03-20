@@ -43,10 +43,10 @@ namespace ImageSharp
                 throw new InvalidOperationException("No image formats have been configured.");
             }
 
+            this.MetaData = new ImageMetaData();
             this.CurrentImageFormat = this.Configuration.ImageFormats.First();
         }
 
-        
         /// <summary>
         /// Initializes a new instance of the <see cref="Image{TColor}"/> class
         /// with the height and the width of the image.
@@ -64,7 +64,7 @@ namespace ImageSharp
             {
                 throw new InvalidOperationException("No image formats have been configured.");
             }
-            
+
             this.MetaData = new ImageMetaData(metadata);
             this.CurrentImageFormat = this.Configuration.ImageFormats.First();
         }

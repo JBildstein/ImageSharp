@@ -155,6 +155,7 @@ namespace ImageSharp.Formats
         /// <exception cref="System.ArgumentOutOfRangeException">
         /// Thrown if the image is larger than the maximum allowable size.
         /// </exception>
+        /// <returns>The decoded image</returns>
         public Image<TColor> Decode<TColor>(Stream stream)
             where TColor : struct, IPixel<TColor>
         {
@@ -209,10 +210,10 @@ namespace ImageSharp.Formats
 
                 if (this.header.Width > Image<TColor>.MaxWidth || this.header.Height > Image<TColor>.MaxHeight)
                 {
-                    throw new ArgumentOutOfRangeException($"The input png '{this.header.Width}x{this.header.Height}' is bigger than the max allowed size '{image.MaxWidth}x{image.MaxHeight}'");
+                    throw new ArgumentOutOfRangeException($"The input png '{this.header.Width}x{this.header.Height}' is bigger than the max allowed size '{Image<TColor>.MaxWidth}x{Image<TColor>.MaxHeight}'");
                 }
 
-                var image = new Image<TColor>(this.header.Width, this.header.Height, metadata);
+                Image<TColor> image = new Image<TColor>(this.header.Width, this.header.Height, metadata);
 
                 using (PixelAccessor<TColor> pixels = image.Lock())
                 {
@@ -767,8 +768,7 @@ namespace ImageSharp.Formats
         /// <summary>
         /// Reads a text chunk containing image properties from the data.
         /// </summary>
-        /// <typeparam name="TColor">The pixel format.</typeparam>
-        /// <param name="image">The image to decode to.</param>
+        /// <param name="metadata">The metadata to decode to.</param>
         /// <param name="data">The <see cref="T:byte[]"/> containing  data.</param>
         /// <param name="length">The maximum length to read.</param>
         private void ReadTextChunk(ImageMetaData metadata, byte[] data, int length)
