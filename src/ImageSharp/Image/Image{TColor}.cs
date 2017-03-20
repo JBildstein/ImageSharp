@@ -46,200 +46,27 @@ namespace ImageSharp
             this.CurrentImageFormat = this.Configuration.ImageFormats.First();
         }
 
+        
         /// <summary>
-        /// Initializes a new instance of the <see cref="Image{TColor}"/> class.
+        /// Initializes a new instance of the <see cref="Image{TColor}"/> class
+        /// with the height and the width of the image.
         /// </summary>
-        /// <param name="stream">
-        /// The stream containing image information.
-        /// </param>
-        /// <exception cref="System.ArgumentNullException">Thrown if the <paramref name="stream"/> is null.</exception>
-        public Image(Stream stream)
-            : this(stream, null, null)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Image{TColor}"/> class.
-        /// </summary>
-        /// <param name="stream">
-        /// The stream containing image information.
-        /// </param>
-        /// <param name="options">
-        /// The options for the decoder.
-        /// </param>
-        /// <exception cref="System.ArgumentNullException">Thrown if the <paramref name="stream"/> is null.</exception>
-        public Image(Stream stream, IDecoderOptions options)
-            : this(stream, options, null)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Image{TColor}"/> class.
-        /// </summary>
-        /// <param name="stream">
-        /// The stream containing image information.
-        /// </param>
+        /// <param name="width">The width of the image in pixels.</param>
+        /// <param name="height">The height of the image in pixels.</param>
+        /// <param name="metadata">The metadata.</param>
         /// <param name="configuration">
         /// The configuration providing initialization code which allows extending the library.
         /// </param>
-        /// <exception cref="System.ArgumentNullException">Thrown if the <paramref name="stream"/> is null.</exception>
-        public Image(Stream stream, Configuration configuration)
-            : this(stream, null, configuration)
+        public Image(int width, int height, ImageMetaData metadata, Configuration configuration = null)
+            : base(width, height, configuration)
         {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Image{TColor}"/> class.
-        /// </summary>
-        /// <param name="stream">
-        /// The stream containing image information.
-        /// </param>
-        /// <param name="options">
-        /// The options for the decoder.
-        /// </param>
-        /// <param name="configuration">
-        /// The configuration providing initialization code which allows extending the library.
-        /// </param>
-        /// <exception cref="System.ArgumentNullException">Thrown if the <paramref name="stream"/> is null.</exception>
-        public Image(Stream stream, IDecoderOptions options, Configuration configuration)
-            : base(configuration)
-        {
-            Guard.NotNull(stream, nameof(stream));
-            this.Load(stream, options);
-        }
-
-#if !NETSTANDARD1_1
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Image{TColor}"/> class.
-        /// </summary>
-        /// <param name="filePath">
-        /// The file containing image information.
-        /// </param>
-        /// <exception cref="System.ArgumentNullException">Thrown if the <paramref name="filePath"/> is null.</exception>
-        public Image(string filePath)
-            : this(filePath, null, null)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Image{TColor}"/> class.
-        /// </summary>
-        /// <param name="filePath">
-        /// The file containing image information.
-        /// </param>
-        /// <param name="options">
-        /// The options for the decoder.
-        /// </param>
-        /// <exception cref="System.ArgumentNullException">Thrown if the <paramref name="filePath"/> is null.</exception>
-        public Image(string filePath, IDecoderOptions options)
-            : this(filePath, options, null)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Image{TColor}"/> class.
-        /// </summary>
-        /// <param name="filePath">
-        /// The file containing image information.
-        /// </param>
-        /// <param name="configuration">
-        /// The configuration providing initialization code which allows extending the library.
-        /// </param>
-        /// <exception cref="System.ArgumentNullException">Thrown if the <paramref name="filePath"/> is null.</exception>
-        public Image(string filePath, Configuration configuration)
-            : this(filePath, null, configuration)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Image{TColor}"/> class.
-        /// </summary>
-        /// <param name="filePath">
-        /// The file containing image information.
-        /// </param>
-        /// <param name="options">
-        /// The options for the decoder.
-        /// </param>
-        /// <param name="configuration">
-        /// The configuration providing initialization code which allows extending the library.
-        /// </param>
-        /// <exception cref="System.ArgumentNullException">Thrown if the <paramref name="filePath"/> is null.</exception>
-        public Image(string filePath, IDecoderOptions options, Configuration configuration)
-            : base(configuration)
-        {
-            Guard.NotNull(filePath, nameof(filePath));
-
-            using (Stream fs = this.Configuration.FileSystem.OpenRead(filePath))
+            if (!this.Configuration.ImageFormats.Any())
             {
-                this.Load(fs, options);
+                throw new InvalidOperationException("No image formats have been configured.");
             }
-        }
-#endif
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Image{TColor}"/> class.
-        /// </summary>
-        /// <param name="bytes">
-        /// The byte array containing image information.
-        /// </param>
-        /// <exception cref="System.ArgumentNullException">Thrown if the <paramref name="bytes"/> is null.</exception>
-        public Image(byte[] bytes)
-            : this(bytes, null, null)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Image{TColor}"/> class.
-        /// </summary>
-        /// <param name="bytes">
-        /// The byte array containing image information.
-        /// </param>
-        /// <param name="options">
-        /// The options for the decoder.
-        /// </param>
-        /// <exception cref="System.ArgumentNullException">Thrown if the <paramref name="bytes"/> is null.</exception>
-        public Image(byte[] bytes, IDecoderOptions options)
-            : this(bytes, options, null)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Image{TColor}"/> class.
-        /// </summary>
-        /// <param name="bytes">
-        /// The byte array containing image information.
-        /// </param>
-        /// <param name="configuration">
-        /// The configuration providing initialization code which allows extending the library.
-        /// </param>
-        /// <exception cref="System.ArgumentNullException">Thrown if the <paramref name="bytes"/> is null.</exception>
-        public Image(byte[] bytes, Configuration configuration)
-            : this(bytes, null, configuration)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Image{TColor}"/> class.
-        /// </summary>
-        /// <param name="bytes">
-        /// The byte array containing image information.
-        /// </param>
-        /// <param name="options">
-        /// The options for the decoder.
-        /// </param>
-        /// <param name="configuration">
-        /// The configuration providing initialization code which allows extending the library.
-        /// </param>
-        /// <exception cref="System.ArgumentNullException">Thrown if the <paramref name="bytes"/> is null.</exception>
-        public Image(byte[] bytes, IDecoderOptions options, Configuration configuration)
-            : base(configuration)
-        {
-            Guard.NotNull(bytes, nameof(bytes));
-
-            using (MemoryStream stream = new MemoryStream(bytes, false))
-            {
-                this.Load(stream, options);
-            }
+            
+            this.MetaData = new ImageMetaData(metadata);
+            this.CurrentImageFormat = this.Configuration.ImageFormats.First();
         }
 
         /// <summary>
@@ -592,99 +419,6 @@ namespace ImageSharp
 
             this.CurrentImageFormat = other.CurrentImageFormat;
             this.MetaData = new ImageMetaData(other.MetaData);
-        }
-
-        /// <summary>
-        /// Loads the image from the given stream.
-        /// </summary>
-        /// <param name="stream">The stream containing image information.</param>
-        /// <param name="options">The options for the decoder.</param>
-        /// <exception cref="NotSupportedException">
-        /// Thrown if the stream is not readable nor seekable.
-        /// </exception>
-        private void Load(Stream stream, IDecoderOptions options)
-        {
-            if (!this.Configuration.ImageFormats.Any())
-            {
-                throw new InvalidOperationException("No image formats have been configured.");
-            }
-
-            if (!stream.CanRead)
-            {
-                throw new NotSupportedException("Cannot read from the stream.");
-            }
-
-            if (stream.CanSeek)
-            {
-                if (this.Decode(stream, options))
-                {
-                    return;
-                }
-            }
-            else
-            {
-                // We want to be able to load images from things like HttpContext.Request.Body
-                using (MemoryStream ms = new MemoryStream())
-                {
-                    stream.CopyTo(ms);
-                    ms.Position = 0;
-
-                    if (this.Decode(ms, options))
-                    {
-                        return;
-                    }
-                }
-            }
-
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.AppendLine("Image cannot be loaded. Available formats:");
-
-            foreach (IImageFormat format in this.Configuration.ImageFormats)
-            {
-                stringBuilder.AppendLine("-" + format);
-            }
-
-            throw new NotSupportedException(stringBuilder.ToString());
-        }
-
-        /// <summary>
-        /// Decodes the image stream to the current image.
-        /// </summary>
-        /// <param name="stream">The stream.</param>
-        /// <param name="options">The options for the decoder.</param>
-        /// <returns>
-        /// The <see cref="bool"/>.
-        /// </returns>
-        private bool Decode(Stream stream, IDecoderOptions options)
-        {
-            int maxHeaderSize = this.Configuration.MaxHeaderSize;
-            if (maxHeaderSize <= 0)
-            {
-                return false;
-            }
-
-            IImageFormat format;
-            byte[] header = ArrayPool<byte>.Shared.Rent(maxHeaderSize);
-            try
-            {
-                long startPosition = stream.Position;
-                stream.Read(header, 0, maxHeaderSize);
-                stream.Position = startPosition;
-                format = this.Configuration.ImageFormats.FirstOrDefault(x => x.IsSupportedFileFormat(header));
-            }
-            finally
-            {
-                ArrayPool<byte>.Shared.Return(header);
-            }
-
-            if (format == null)
-            {
-                return false;
-            }
-
-            format.Decoder.Decode(this, stream, options);
-            this.CurrentImageFormat = format;
-            return true;
         }
     }
 }

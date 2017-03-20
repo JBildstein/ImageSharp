@@ -28,11 +28,6 @@ namespace ImageSharp.Formats
         private readonly IGifDecoderOptions options;
 
         /// <summary>
-        /// The image to decode the information to.
-        /// </summary>
-        private Image<TColor> decodedImage;
-
-        /// <summary>
         /// The currently loaded stream.
         /// </summary>
         private Stream currentStream;
@@ -68,6 +63,16 @@ namespace ImageSharp.Formats
         private GifGraphicsControlExtension graphicsControlExtension;
 
         /// <summary>
+        /// The metadata
+        /// </summary>
+        private ImageMetaData MetaData;
+
+        /// <summary>
+        /// The image to decode the information to.
+        /// </summary>
+        private Image<TColor> Image;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="GifDecoderCore{TColor}"/> class.
         /// </summary>
         /// <param name="options">The decoder options.</param>
@@ -79,13 +84,12 @@ namespace ImageSharp.Formats
         /// <summary>
         /// Decodes the stream to the image.
         /// </summary>
-        /// <param name="image">The image to decode to.</param>
         /// <param name="stream">The stream containing image data. </param>
-        public void Decode(Image<TColor> image, Stream stream)
+        public Image<TColor> Decode(Stream stream)
         {
             try
             {
-                this.decodedImage = image;
+                this.MetaData = new ImageMetaData();
 
                 this.currentStream = stream;
 
@@ -144,6 +148,8 @@ namespace ImageSharp.Formats
                     ArrayPool<byte>.Shared.Return(this.globalColorTable);
                 }
             }
+
+            return this.Image;
         }
 
         /// <summary>
@@ -212,10 +218,10 @@ namespace ImageSharp.Formats
                 throw new ImageFormatException($"Invalid gif colormap size '{this.logicalScreenDescriptor.GlobalColorTableSize}'");
             }
 
-            if (this.logicalScreenDescriptor.Width > this.decodedImage.MaxWidth || this.logicalScreenDescriptor.Height > this.decodedImage.MaxHeight)
+            if (this.logicalScreenDescriptor.Width > Image<TColor>.MaxWidth || this.logicalScreenDescriptor.Height > Image<TColor>.MaxHeight)
             {
                 throw new ArgumentOutOfRangeException(
-                    $"The input gif '{this.logicalScreenDescriptor.Width}x{this.logicalScreenDescriptor.Height}' is bigger then the max allowed size '{this.decodedImage.MaxWidth}x{this.decodedImage.MaxHeight}'");
+                    $"The input gif '{this.logicalScreenDescriptor.Width}x{this.logicalScreenDescriptor.Height}' is bigger then the max allowed size '{Image<TColor>.MaxWidth}x{Image<TColor>.MaxHeight}'");
             }
         }
 
@@ -261,7 +267,7 @@ namespace ImageSharp.Formats
                 {
                     this.currentStream.Read(commentsBuffer, 0, length);
                     string comments = this.options.TextEncoding.GetString(commentsBuffer, 0, length);
-                    this.decodedImage.MetaData.Properties.Add(new ImageProperty(GifConstants.Comments, comments));
+                    this.MetaData.Properties.Add(new ImageProperty(GifConstants.Comments, comments));
                 }
                 finally
                 {
@@ -343,14 +349,14 @@ namespace ImageSharp.Formats
 
             if (this.previousFrame == null)
             {
-                this.decodedImage.MetaData.Quality = colorTableLength / 3;
+                this.MetaData.Quality = colorTableLength / 3;
 
                 // This initializes the image to become fully transparent because the alpha channel is zero.
-                this.decodedImage.InitPixels(imageWidth, imageHeight);
+                this.Image = new Image<TColor>(imageWidth, imageHeight, this.MetaData);
 
-                this.SetFrameDelay(this.decodedImage.MetaData);
+                this.SetFrameDelay(this.MetaData);
 
-                image = this.decodedImage;
+                image = this.Image;
             }
             else
             {
@@ -368,7 +374,7 @@ namespace ImageSharp.Formats
 
                 this.RestoreToBackground(image);
 
-                this.decodedImage.Frames.Add(currentFrame);
+                this.Image.Frames.Add(currentFrame);
             }
 
             int i = 0;
@@ -441,7 +447,7 @@ namespace ImageSharp.Formats
                 return;
             }
 
-            this.previousFrame = currentFrame == null ? this.decodedImage.ToFrame() : currentFrame;
+            this.previousFrame = currentFrame == null ? this.Image.ToFrame() : currentFrame;
 
             if (this.graphicsControlExtension != null &&
                 this.graphicsControlExtension.DisposalMethod == DisposalMethod.RestoreToBackground)
@@ -462,8 +468,8 @@ namespace ImageSharp.Formats
             }
 
             // Optimization for when the size of the frame is the same as the image size.
-            if (this.restoreArea.Value.Width == this.decodedImage.Width &&
-                this.restoreArea.Value.Height == this.decodedImage.Height)
+            if (this.restoreArea.Value.Width == this.Image.Width &&
+                this.restoreArea.Value.Height == this.Image.Height)
             {
                 using (PixelAccessor<TColor> pixelAccessor = frame.Lock())
                 {

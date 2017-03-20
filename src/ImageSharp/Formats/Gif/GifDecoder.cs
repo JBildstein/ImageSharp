@@ -29,10 +29,10 @@ namespace ImageSharp.Formats
         /// <param name="image">The <see cref="ImageBase{TColor}"/> to decode to.</param>
         /// <param name="stream">The <see cref="Stream"/> containing image data.</param>
         /// <param name="options">The options for the decoder.</param>
-        public void Decode<TColor>(Image<TColor> image, Stream stream, IGifDecoderOptions options)
+        public Image<TColor> Decode<TColor>(Stream stream, IGifDecoderOptions options)
             where TColor : struct, IPixel<TColor>
         {
-            new GifDecoderCore<TColor>(options).Decode(image, stream);
+            return new GifDecoderCore<TColor>(options).Decode(stream);
         }
     }
 }

@@ -91,10 +91,10 @@ namespace ImageSharp
         }
 
         /// <inheritdoc/>
-        public int MaxWidth { get; set; } = int.MaxValue;
+        public const int MaxWidth = int.MaxValue;
 
         /// <inheritdoc/>
-        public int MaxHeight { get; set; } = int.MaxValue;
+        public const int MaxHeight = int.MaxValue;
 
         /// <inheritdoc/>
         public TColor[] Pixels => this.pixelBuffer;
@@ -137,17 +137,6 @@ namespace ImageSharp
             // and prevent finalization code for this object
             // from executing a second time.
             GC.SuppressFinalize(this);
-        }
-
-        /// <inheritdoc/>
-        public void InitPixels(int width, int height)
-        {
-            Guard.MustBeGreaterThan(width, 0, nameof(width));
-            Guard.MustBeGreaterThan(height, 0, nameof(height));
-
-            this.Width = width;
-            this.Height = height;
-            this.RentPixels();
         }
 
         /// <inheritdoc/>
