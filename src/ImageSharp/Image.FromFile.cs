@@ -30,7 +30,7 @@ namespace ImageSharp
         /// <returns>The image</returns>
         public static Image Load(string stream)
         {
-            return Load(stream, null, Configuration.Default);
+            return Load(stream, null, null);
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace ImageSharp
         /// <returns>The image</returns>
         public static Image Load(string stream, IDecoderOptions options)
         {
-            return Load(stream, options, Configuration.Default);
+            return Load(stream, options, null);
         }
 
         /// <summary>
@@ -73,11 +73,7 @@ namespace ImageSharp
         /// <returns>The image</returns>
         public static Image Load(string stream, IDecoderOptions options, Configuration config)
         {
-            config = config ?? Configuration.Default;
-            using (Stream s = config.FileSystem.OpenRead(stream))
-            {
-                return Image.Load(s, options, config);
-            }
+            return new Image(Image.Load<Color>(s, options, config));
         }
 
         /// <summary>
@@ -92,7 +88,7 @@ namespace ImageSharp
         public static Image<TColor> Load<TColor>(string stream)
             where TColor : struct, IPixel<TColor>
         {
-            return Load<TColor>(stream, null, Configuration.Default);
+            return Load<TColor>(stream, null, null);
         }
 
         /// <summary>
@@ -108,7 +104,7 @@ namespace ImageSharp
         public static Image<TColor> Load<TColor>(string stream, IDecoderOptions options)
             where TColor : struct, IPixel<TColor>
         {
-            return Load<TColor>(stream, options, Configuration.Default);
+            return Load<TColor>(stream, options, null);
         }
 
         /// <summary>
@@ -141,7 +137,7 @@ namespace ImageSharp
         public static Image<TColor> Load<TColor>(string stream, IDecoderOptions options, Configuration config)
             where TColor : struct, IPixel<TColor>
         {
-            config = config ?? Configuration.Default;
+            config = config ?? DefaultLoaderConfiguration?.Invoke() ?? Configuration.Default;
             using (Stream s = config.FileSystem.OpenRead(stream))
             {
                 return Load<TColor>(s, options, config);

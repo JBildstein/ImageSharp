@@ -29,7 +29,7 @@ namespace ImageSharp
         /// <returns>The image</returns>
         public static Image Load(byte[] stream)
         {
-            return Load(stream, null, Configuration.Default);
+            return Load(stream, null, null);
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace ImageSharp
         /// <returns>The image</returns>
         public static Image Load(byte[] stream, IDecoderOptions options)
         {
-            return Load(stream, options, Configuration.Default);
+            return Load(stream, options, null);
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace ImageSharp
         public static Image<TColor> Load<TColor>(byte[] stream)
             where TColor : struct, IPixel<TColor>
         {
-            return Load<TColor>(stream, null, Configuration.Default);
+            return Load<TColor>(stream, null, null);
         }
 
         /// <summary>
@@ -106,7 +106,7 @@ namespace ImageSharp
         public static Image<TColor> Load<TColor>(byte[] stream, IDecoderOptions options)
             where TColor : struct, IPixel<TColor>
         {
-            return Load<TColor>(stream, options, Configuration.Default);
+            return Load<TColor>(stream, options, null);
         }
 
         /// <summary>
