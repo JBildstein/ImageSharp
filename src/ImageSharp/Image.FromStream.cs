@@ -20,14 +20,6 @@ namespace ImageSharp
     public sealed partial class Image
     {
         /// <summary>
-        /// Gets or sets an action to provide the default configuration if the configuration object is not passe dinto one of the load methods.
-        /// </summary>
-        /// <remarks>
-        /// I have this specialist viersion in here so that I can swap out the default fallback Configuration to a mock filled on without breaking other tests that may be ran in parellel.
-        /// </remarks>
-        internal static Func<Configuration> DefaultLoaderConfiguration { get; set; } = () => Configuration.Default;
-
-        /// <summary>
         /// Loads the image from the given stream.
         /// </summary>
         /// <param name="stream">The stream containing image information.</param>
@@ -37,7 +29,7 @@ namespace ImageSharp
         /// <returns>The image</returns>
         public static Image Load(Stream stream)
         {
-            return Load(stream, null, Configuration.Default);
+            return Load(stream, null, null);
         }
 
         /// <summary>
@@ -144,7 +136,7 @@ namespace ImageSharp
         public static Image<TColor> Load<TColor>(Stream stream, IDecoderOptions options, Configuration config)
             where TColor : struct, IPixel<TColor>
         {
-            config = config ?? DefaultLoaderConfiguration?.Invoke() ?? Configuration.Default;
+            config = config ?? Configuration.Default;
 
             if (!config.ImageFormats.Any())
             {

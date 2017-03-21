@@ -73,7 +73,7 @@ namespace ImageSharp
         /// <returns>The image</returns>
         public static Image Load(string stream, IDecoderOptions options, Configuration config)
         {
-            return new Image(Image.Load<Color>(s, options, config));
+            return new Image(Image.Load<Color>(stream, options, config));
         }
 
         /// <summary>
@@ -137,7 +137,7 @@ namespace ImageSharp
         public static Image<TColor> Load<TColor>(string stream, IDecoderOptions options, Configuration config)
             where TColor : struct, IPixel<TColor>
         {
-            config = config ?? DefaultLoaderConfiguration?.Invoke() ?? Configuration.Default;
+            config = config ?? Configuration.Default;
             using (Stream s = config.FileSystem.OpenRead(stream))
             {
                 return Load<TColor>(s, options, config);
